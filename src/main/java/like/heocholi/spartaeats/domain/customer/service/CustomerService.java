@@ -30,10 +30,12 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final PasswordEncoder passwordEncoder;
-
-    //회원가입 메서드
-    // requestDto 회원가입 요청 DTO (SignupRequestDto)
-    // String 회원가입 성공 메시지
+    
+    /**
+     * 회원가입
+     * @param requestDto
+     * @return 회원가입 결과
+     */
     @Transactional
     public SignupResponseDto signup(SignupRequestDto requestDto) {
         String userId = requestDto.getUserId();
@@ -53,18 +55,12 @@ public class CustomerService {
         return new SignupResponseDto(customer);
     }
     
-    //로그아웃
-    @Transactional
-    public String logout(String userId) {
-        // 유저 확인
-        Customer customer = this.findByUserId(userId);
-        
-        customer.removeRefreshToken();
-        
-        return customer.getUserId();
-    }
-    
-    //회원 탈퇴
+    /**
+     * 회원 탈퇴
+     * @param requestDto
+     * @param userId
+     * @return 탈퇴된 회원Id
+     */
     @Transactional
     public String withdrawCustomer(WithdrawRequestDto requestDto, String userId) {
         // 유저 확인
@@ -83,26 +79,44 @@ public class CustomerService {
         return customer.getUserId();
     }
     
+    /**
+     * 로그아웃
+     * @param userId
+     * @return 로그아웃된 회원Id
+     */
+    @Transactional
+    public String logout(String userId) {
+        // 유저 확인
+        Customer customer = this.findByUserId(userId);
+        
+        customer.removeRefreshToken();
+        
+        return customer.getUserId();
+    }
+    
 
-    //유저 정보 조회
+    /**
+     * 프로필 조회
+     * @param customer
+     * @return 프로필 조회 결과
+     */
     public CustomerResponseDTO getCustomerInfo(Customer customer) {
         return new CustomerResponseDTO(customer);
     }
 
 
-    //비밀번호 업데이트 메서드
-    // customerId 사용자 ID
-    // request 비밀번호 업데이트 요청 DTO (PasswordRequest)
-    // String 비밀번호 업데이트 결과 메시지
-
+    /**
+     * 비밀번호 변경
+     * @param request
+     * @param customer
+     * @return 변경된 회원Id
+     */
     @Transactional
     public String updatePassword(PasswordRequestDTO request, Customer customer) {
-        //1. 현재 저장된 비밀번호랑 request에서 현재 비밀번호라고 입력한 애랑 일치하는지!
         if (!passwordEncoder.matches(request.getCurrentPassword(), customer.getPassword())) {
             throw new PasswordException(ErrorType.INVALID_PASSWORD);
         }
-
-        //2. 얘가 새로 바꾸려고 하는 비밀번호랑, 얘가 최근에 사용했던 비밀번호 3개 중에 일치하는 게 있는지!
+        
         List<PasswordHistory> passwordHistories = passwordHistoryRepository.findTop3ByCustomerOrderByCreatedAtDesc(customer);
 
         for (PasswordHistory passwordHistory : passwordHistories) {
@@ -110,27 +124,26 @@ public class CustomerService {
                 throw new PasswordException(ErrorType.RECENTLY_USED_PASSWORD);
             }
         }
-
-        //3. PasswordHistory에 현재 비밀번호 저장!
+        
         PasswordHistory passwordHistory = PasswordHistory.builder()
                 .customer(customer)
                 .password(customer.getPassword())
                 .build();
 
         passwordHistoryRepository.save(passwordHistory);
-
-        //4. 비밀번호 업데이트!
+        
         customer.updatePassword(passwordEncoder.encode(request.getNewPassword()));
         customerRepository.save(customer);
 
         return customer.getUserId();
     }
 
-    //프로필 업데이트 메서드
-    // customerId 사용자 ID
-    // request 프로필 업데이트 요청 DTO (ProfileRequest)
-    // String 프로필 업데이트 결과 메시지
-
+    /**
+     * 프로필 업데이트
+     * @param request
+     * @param customer
+     * @return 업데이트된 프로필
+     */
     @Transactional
     public ProfileResponseDTO updateProfile(ProfileRequestDTO request, Customer customer) {
         // 프로필 업데이트
@@ -140,6 +153,12 @@ public class CustomerService {
         return new ProfileResponseDTO(customer);
     }
 
+    /* util */
+    
+    /**
+     * 비밀번호 히스토리 저장
+     * @param customer
+     */
     private void insertPasswordHistory(Customer customer) {
         PasswordHistory passwordHistory = PasswordHistory.builder()
                 .customer(customer)
@@ -149,6 +168,11 @@ public class CustomerService {
         passwordHistoryRepository.save(passwordHistory);
     }
 
+    /**
+     * 유저 아이디로 회원 조회
+     * @param userId
+     * @return 회원
+     */
     private Customer findByUserId(String userId){
         return customerRepository.findByUserId(userId).orElseThrow(()-> new CustomerException(ErrorType.NOT_FOUND_USER));
     }

@@ -1,5 +1,15 @@
 package like.heocholi.spartaeats.domain.customer.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import jakarta.validation.Valid;
 import like.heocholi.spartaeats.domain.common.dto.ResponseMessage;
 import like.heocholi.spartaeats.domain.customer.dto.CustomerResponseDTO;
@@ -9,27 +19,23 @@ import like.heocholi.spartaeats.domain.customer.dto.ProfileResponseDTO;
 import like.heocholi.spartaeats.domain.customer.dto.SignupRequestDto;
 import like.heocholi.spartaeats.domain.customer.dto.SignupResponseDto;
 import like.heocholi.spartaeats.domain.customer.dto.WithdrawRequestDto;
-import like.heocholi.spartaeats.global.security.UserDetailsImpl;
 import like.heocholi.spartaeats.domain.customer.service.CustomerService;
+import like.heocholi.spartaeats.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/customers")
 public class CustomerController {
-
-    @Autowired
     private final CustomerService customerService;
 
     /**
-     * 회원가입 API
-     * @param requestDto 회원가입 내용
-     * @return 회원가입 정보, 응답 상태, 메시지
+     * 회원가입
+     * @param requestDto
+     * @return ResponseMessage<SignupResponseDto>
+     *     - statusCode: 201
+     *     - message: "회원가입 성공"
+     *     - data: 회원가입 결과
      */
     @PostMapping
     public ResponseEntity<ResponseMessage<SignupResponseDto>> signup(@RequestBody @Valid SignupRequestDto requestDto){
@@ -45,28 +51,13 @@ public class CustomerController {
     }
 
     /**
-     * 로그아웃 API
-     * @param userDetails 유저 정보
-     * @return 회원Id, 응답 상태, 메시지
-     */
-    @PutMapping("/logout")
-    public ResponseEntity<ResponseMessage<String>> logout(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        String userId = customerService.logout(userDetails.getUsername());
-
-        ResponseMessage<String> responseMessage = ResponseMessage.<String>builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("로그아웃 성공")
-                .data(userId)
-                .build();
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-    }
-
-    /**
-     * 회원 탈퇴 API
-     * @param requestDto 회원탈퇴 내용(비밀번호)
-     * @param userDetails 회원 정보
-     * @return 회원Id, 응답상태, 메시지
+     * 회원 탈퇴
+     * @param requestDto
+     * @param userDetails
+     * @return
+     *    - statusCode: 200
+     *    - message: "회원 탈퇴가 완료되었습니다."
+     *    - data: 탈퇴된 회원Id
      */
     @PutMapping("/withdraw")
     public ResponseEntity<ResponseMessage<String>> withdrawCustomer(@RequestBody WithdrawRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -81,9 +72,37 @@ public class CustomerController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
+    
+    /**
+     * 로그아웃
+     * @param userDetails
+     * @return
+     *   - statusCode: 200
+     *   - message: "로그아웃 성공"
+     *   - data: 로그아웃된 회원Id
+     */
+    @PutMapping("/logout")
+    public ResponseEntity<ResponseMessage<String>> logout(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        String userId = customerService.logout(userDetails.getUsername());
+        
+        ResponseMessage<String> responseMessage = ResponseMessage.<String>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("로그아웃 성공")
+            .data(userId)
+            .build();
+        
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 
     
-    // 프로필 조회 API
+    /**
+     * 프로필 조회
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<CustomerResponseDTO>>
+     *     - statusCode: 200
+     *     - message: "프로필 조회가 완료되었습니다."
+     *     - data: 프로필 조회 결과
+     */
     @GetMapping
     public ResponseEntity<ResponseMessage<CustomerResponseDTO>> getCustomerInfo (@AuthenticationPrincipal UserDetailsImpl userDetails) {
         CustomerResponseDTO responseDTO =  customerService.getCustomerInfo(userDetails.getCustomer());
@@ -97,10 +116,15 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
-    // 비밀번호 업데이트 API
-    // customerId 사용자 ID
-    // request 요청 DTO (PasswordRequest)
-    // ResponseEntity<String> 업데이트 결과 메시지
+    /**
+     * 비밀번호 변경
+     * @param request
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<String>>
+     *     - statusCode: 200
+     *     - message: "비밀번호 변경이 완료되었습니다."
+     *     - data: 변경된 회원Id
+     */
     @PutMapping("/password")
     public ResponseEntity<ResponseMessage<String>> updatePassword(@RequestBody @Valid PasswordRequestDTO request,
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -116,10 +140,15 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
-    //프로필 업데이트 API
-    // customerId 사용자 ID
-    // request 요청 DTO (ProfileRequest)
-    // ResponseEntity<String> 업데이트 결과 메시지
+    /**
+     * 프로필 수정
+     * @param request
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<ProfileResponseDTO>>
+     *     - statusCode: 200
+     *     - message: "프로필 업데이트가 완료되었습니다."
+     *     - data: 업데이트된 프로필
+     */
     @PutMapping
     public ResponseEntity<ResponseMessage<ProfileResponseDTO>> updateProfile(@RequestBody @Valid ProfileRequestDTO request,
                                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
