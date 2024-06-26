@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Table(name ="picks")
-public class Pick {
+public class Pick extends Timestamped {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

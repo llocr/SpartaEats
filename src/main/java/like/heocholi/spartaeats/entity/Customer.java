@@ -37,7 +37,7 @@ public class Customer extends Timestamped {
 	@Enumerated(value = EnumType.STRING)
 	private UserRole role;
 
-	@OneToMany(mappedBy = "customer")
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Pick> pickList;
 
 	public Customer(SignupRequestDto requestDto, String encodedPassword) {

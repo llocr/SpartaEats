@@ -30,7 +30,7 @@ public class Manager extends Timestamped{
 	@Enumerated(value = EnumType.STRING)
 	private UserRole role;
 	
-	@OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "manager", cascade = CascadeType.PERSIST)
 	private List<Store> storeList;
 
 	public Manager(SignupRequestDto requestDto, String encodedPassword) {
