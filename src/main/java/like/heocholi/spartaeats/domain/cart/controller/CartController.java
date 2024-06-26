@@ -25,7 +25,15 @@ import lombok.RequiredArgsConstructor;
 public class CartController {
 	private final CartService cartService;
 	
-	// 장바구니에 메뉴 추가
+	/**
+	 * 장바구니 메뉴 추가
+	 * @param cartRequestDTO
+	 * @param userDetails
+	 * @return ResponseEntity<ResponseMessage<Long>>
+	 *     - statusCode: 201
+	 *     - message: "장바구니에 메뉴가 추가되었습니다."
+	 *     - data: 추가된 메뉴의 아이디
+	 */
 	@PostMapping
 	public ResponseEntity<ResponseMessage<Long>> addCart(@Valid @RequestBody CartRequestDTO cartRequestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 		Long menuId = cartService.addCart(cartRequestDTO, userDetails.getCustomer());
@@ -39,7 +47,14 @@ public class CartController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}
 	
-	// 장바구니 목록 불러오기
+	/**
+	 * 장바구니 목록 조회
+	 * @param userDetails
+	 * @return ResponseEntity<ResponseMessage<CartResponseDTO>>
+	 *     - statusCode: 200
+	 *     - message: "장바구니 목록을 불러왔습니다."
+	 *     - data: 장바구니 목록
+	 */
 	@GetMapping
 	public ResponseEntity<ResponseMessage<CartResponseDTO>> getCart(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		CartResponseDTO cartResponseDTO = cartService.getCarts(userDetails.getCustomer());
@@ -53,7 +68,14 @@ public class CartController {
 		return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
 	}
 	
-	// 장바구니 전체 삭제
+	/**
+	 * 장바구니 메뉴 전체 삭제
+	 * @param userDetails
+	 * @return ResponseEntity<ResponseMessage<Long>>
+	 *     - statusCode: 200
+	 *     - message: "장바구니가 비워졌습니다."
+	 *     - data: 고객 아이디
+	 */
 	@DeleteMapping
 	public ResponseEntity<ResponseMessage<Long>> deleteAllCart(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		Long customerId = cartService.deleteAllCart(userDetails.getCustomer());
@@ -67,7 +89,15 @@ public class CartController {
 		return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
 	}
 	
-	// 장바구니 단일 삭제
+	/**
+	 * 장바구니 메뉴 단일 삭제하기
+	 * @param menuId
+	 * @param userDetails
+	 * @return ResponseEntity<ResponseMessage<Long>>
+	 *     - statusCode: 200
+	 *     - message: "장바구니에서 메뉴가 삭제되었습니다."
+	 *     - data: 삭제된 메뉴의 아이디
+	 */
 	@DeleteMapping("/{menuId}")
 	public ResponseEntity<ResponseMessage<Long>> deleteCart(@PathVariable Long menuId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 		Long deleteMenuId = cartService.deleteCart(menuId, userDetails.getCustomer());

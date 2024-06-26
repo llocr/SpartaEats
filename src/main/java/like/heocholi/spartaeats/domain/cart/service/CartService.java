@@ -24,8 +24,11 @@ public class CartService {
 	private final CartRepository cartRepository;
 	private final MenuRepository menuRepository;
 	
-	/*
-	 * 1. 장바구니에 메뉴 추가
+	/**
+	 * 장바구니 메뉴 추가
+	 * @param cartRequestDTO
+	 * @param customer
+	 * @return 추가된 메뉴의 아이디
 	 */
 	@Transactional
 	public Long addCart(CartRequestDTO cartRequestDTO, Customer customer) {
@@ -56,8 +59,10 @@ public class CartService {
 		return menuId;
 	}
 	
-	/*
-	 * 2. 장바구니 목록 불러오기
+	/**
+	 * 장바구니 목록 조회
+	 * @param customer
+	 * @return 장바구니 목록
 	 */
 	public CartResponseDTO getCarts(Customer customer) {
 		List<Cart> cartList = getCartList(customer);
@@ -73,8 +78,10 @@ public class CartService {
 		return new CartResponseDTO(storeName, menuNames, totalPrice);
 	}
 	
-	/*
-	 * 3. 장바구니 전체 삭제
+	/**
+	 * 장바구니 메뉴 전체 삭제
+	 * @param customer
+	 * @return 고객 아이디
 	 */
 	@Transactional
 	public Long deleteAllCart(Customer customer) {
@@ -84,8 +91,11 @@ public class CartService {
 		return customer.getId();
 	}
 	
-	/*
-	 * 4. 장바구니 단일 삭제
+	/**
+	 * 장바구니 메뉴 단일 삭제하기
+	 * @param menuId
+	 * @param customer
+	 * @return 삭제된 메뉴의 아이디
 	 */
 	@Transactional
 	public Long deleteCart(Long menuId, Customer customer) {
@@ -98,15 +108,21 @@ public class CartService {
 		return menuId;
 	}
 	
-	/*
+	/* util */
+	
+	/**
 	 * 메뉴 조회
+	 * @param menuId
+	 * @return 메뉴
 	 */
 	private Menu getMenu(Long menuId) {
 		return menuRepository.findById(menuId).orElseThrow(() -> new CartException(ErrorType.NOT_FOUND_MENU));
 	}
 	
-	/*
-	 * 장바구니 조회
+	/**
+	 * 장바구니 목록 조회
+	 * @param customer
+	 * @return 장바구니 목록
 	 */
 	public List<Cart> getCartList(Customer customer) {
 		return cartRepository.findByCustomer(customer);
