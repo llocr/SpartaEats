@@ -1,5 +1,6 @@
 package like.heocholi.spartaeats.domain.review.service;
 
+import like.heocholi.spartaeats.domain.like.exception.LikeException;
 import like.heocholi.spartaeats.global.exception.ErrorType;
 import like.heocholi.spartaeats.domain.review.dto.ReviewAddRequestDto;
 import like.heocholi.spartaeats.domain.review.dto.ReviewResponseDto;
@@ -110,5 +111,10 @@ public class ReviewService {
         }
 
         return review;
+    }
+    
+    public Review findReviewById(Long reviewId) {
+        return reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new LikeException(ErrorType.NOT_FOUND_REVIEW));
     }
 }

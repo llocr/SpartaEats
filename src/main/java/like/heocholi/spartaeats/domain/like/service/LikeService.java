@@ -1,31 +1,34 @@
 package like.heocholi.spartaeats.domain.like.service;
 
-import like.heocholi.spartaeats.global.exception.ErrorType;
-import like.heocholi.spartaeats.domain.customer.entity.Customer;
-import like.heocholi.spartaeats.domain.like.entity.Like;
-import like.heocholi.spartaeats.domain.review.entity.Review;
-import like.heocholi.spartaeats.domain.like.exception.LikeException;
-import like.heocholi.spartaeats.domain.like.repository.LikeRepository;
-import like.heocholi.spartaeats.domain.review.repository.ReviewRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import like.heocholi.spartaeats.domain.customer.entity.Customer;
+import like.heocholi.spartaeats.domain.like.entity.Like;
+import like.heocholi.spartaeats.domain.like.exception.LikeException;
+import like.heocholi.spartaeats.domain.like.repository.LikeRepository;
+import like.heocholi.spartaeats.domain.review.entity.Review;
+import like.heocholi.spartaeats.domain.review.service.ReviewService;
+import like.heocholi.spartaeats.global.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
-    private final ReviewRepository reviewRepository;
+    private final ReviewService reviewService;
 
-    //고객이 특정 리뷰에 좋아요를 등록하는 메서드.
+    /**
+     * 리뷰 좋아요 토글
+     * @param reviewId
+     * @param customer
+     * @return 좋아요 여부
+     */
     @Transactional
     public boolean likeReview(Long reviewId, Customer customer) {
-        Review review = findReviewById(reviewId);
+        Review review = reviewService.findReviewById(reviewId);
 
         //본인이 작성한 리뷰에는 좋아요를 남길 수 없다.
         if (customer.getId().equals(review.getCustomer().getId())) {
@@ -38,6 +41,12 @@ public class LikeService {
         return result;
     }
 
+    /**
+     * 좋아요 토글
+     * @param customer
+     * @param review
+     * @return 좋아요 여부
+     */
     private boolean toggleLike(Customer customer, Review review) {
         Optional<Like> optionalLike = likeRepository.findByCustomerIdAndReviewId(customer.getId(), review.getId());
         Like like;
@@ -56,11 +65,5 @@ public class LikeService {
         }
 
         return like.isLike();
-    }
-
-    //리뷰 ID를 기준으로 Review 엔티티를 조회하는 메서드.
-    private Review findReviewById(Long reviewId) {
-        return reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new LikeException(ErrorType.NOT_FOUND_REVIEW));
     }
 }

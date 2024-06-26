@@ -18,9 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class LikeController {
     private final LikeService likeService;
 
-    // 특정 리뷰에 좋아요를 추가하는 요청
-    // customerId 좋아요를 추가하는 사용자의 ID
-    // reviewId 좋아요를 추가할 리뷰의 ID
+    /**
+     * 리뷰 좋아요 등록/취소
+     * @param reviewId
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<Long>>
+     *     - statusCode: 200
+     *     - message: "좋아요 등록" or "좋아요 취소"
+     *     - data: 리뷰Id
+     */
     @PostMapping("/{reviewId}/like")
     public ResponseEntity<ResponseMessage<Long>> likeReview(@PathVariable Long reviewId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
