@@ -1,5 +1,6 @@
 package like.heocholi.spartaeats.domain.store.service;
 
+import like.heocholi.spartaeats.domain.menu.exception.MenuException;
 import like.heocholi.spartaeats.global.exception.ErrorType;
 
 import like.heocholi.spartaeats.domain.store.dto.PickStoreResponseDto;
@@ -96,5 +97,11 @@ public class StoreService {
 
         return pick;
     }
-
+    
+    // 가게 조회
+    public Store findStoreById(Long storeId) {
+        Store store =storeRepository.findById(storeId).orElseThrow(() -> new MenuException(ErrorType.NOT_FOUND_STORE));
+        
+        return store;
+    }
 }
