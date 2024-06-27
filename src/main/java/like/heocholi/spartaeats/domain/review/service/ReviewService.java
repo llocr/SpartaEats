@@ -1,48 +1,50 @@
 package like.heocholi.spartaeats.domain.review.service;
 
-import like.heocholi.spartaeats.domain.like.exception.LikeException;
-import like.heocholi.spartaeats.global.exception.ErrorType;
-import like.heocholi.spartaeats.domain.review.dto.ReviewAddRequestDto;
-import like.heocholi.spartaeats.domain.review.dto.ReviewResponseDto;
-import like.heocholi.spartaeats.domain.review.dto.ReviewUpdateRequestDto;
-import like.heocholi.spartaeats.domain.customer.entity.Customer;
-import like.heocholi.spartaeats.domain.order.entity.Order;
-import like.heocholi.spartaeats.domain.review.entity.Review;
-import like.heocholi.spartaeats.domain.store.entity.Store;
-import like.heocholi.spartaeats.domain.review.exception.ReviewException;
-import like.heocholi.spartaeats.domain.order.repository.OrderRepository;
-import like.heocholi.spartaeats.domain.review.repository.ReviewRepository;
-import like.heocholi.spartaeats.domain.store.repository.StoreRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import like.heocholi.spartaeats.domain.customer.entity.Customer;
+import like.heocholi.spartaeats.domain.order.entity.Order;
+import like.heocholi.spartaeats.domain.order.service.OrderService;
+import like.heocholi.spartaeats.domain.review.dto.ReviewAddRequestDto;
+import like.heocholi.spartaeats.domain.review.dto.ReviewResponseDto;
+import like.heocholi.spartaeats.domain.review.dto.ReviewUpdateRequestDto;
+import like.heocholi.spartaeats.domain.review.entity.Review;
+import like.heocholi.spartaeats.domain.review.exception.ReviewException;
+import like.heocholi.spartaeats.domain.review.repository.ReviewRepository;
+import like.heocholi.spartaeats.domain.store.entity.Store;
+import like.heocholi.spartaeats.domain.store.service.StoreService;
+import like.heocholi.spartaeats.global.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
-
-    private final StoreRepository storeRepository;
-    private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
-
-    // 리뷰조회
+    private final OrderService orderService;
+    private final StoreService storeService;
+    
+    /**
+     * 리뷰 전체 조회
+     * @param storeId
+     * @return 리뷰 리스트
+     */
     public List<ReviewResponseDto> getReviews(Long storeId) {
-
-        Store store = storeRepository.findById(storeId).orElseThrow(
-                () -> new ReviewException(ErrorType.NOT_FOUND_STORE)
-        );
+        Store store = storeService.findStoreById(storeId);
         List<ReviewResponseDto> reviewList = store.getReviews().stream().map(ReviewResponseDto::new).toList();
 
         return reviewList;
     }
 
-    // 리뷰 단건조회
+    /**
+     * 리뷰 단건 조회
+     * @param storeId
+     * @param reviewId
+     * @return 리뷰 정보
+     */
     public ReviewResponseDto getReview(Long storeId, Long reviewId) {
-
         Review review = reviewRepository.findByStoreIdAndId(storeId, reviewId).orElseThrow(
                 () -> new ReviewException(ErrorType.NOT_FOUND_REVIEW)
         );
@@ -51,14 +53,17 @@ public class ReviewService {
     }
 
 
-    // 리뷰 작성
+    /**
+     * 리뷰 추가
+     * @param orderId
+     * @param requestDto
+     * @param customer
+     * @return 리뷰 정보
+     */
     @Transactional
     public ReviewResponseDto addReview(Long orderId, ReviewAddRequestDto requestDto, Customer customer) {
-
-        Order order = orderRepository.findById(orderId).orElseThrow(
-                () -> new ReviewException(ErrorType.NOT_FOUND_ORDER)
-        );
-
+        Order order = orderService.findOrderById(orderId);
+        
         if (!customer.getId().equals(order.getCustomer().getId())) {
             throw new ReviewException(ErrorType.INVALID_ORDER_CUSTOMER);
         }
@@ -74,47 +79,61 @@ public class ReviewService {
 
         return new ReviewResponseDto(review);
     }
-
-    // 리뷰 수정
+    
+    /**
+     * 리뷰 수정
+     * @param reviewId
+     * @param requestDto
+     * @param customer
+     * @return 리뷰 정보
+     */
     @Transactional
     public ReviewResponseDto updateReview(Long reviewId, ReviewUpdateRequestDto requestDto, Customer customer) {
-
-        Review review = findReviewByIdAndCustomercheck(reviewId, customer);
+        Review review = findReviewById(reviewId);
+        checkValidateCustomer(customer, review);
 
         review.update(requestDto.getContents());
 
         return new ReviewResponseDto(review);
     }
 
-    // 리뷰 삭제
+    /**
+     * 리뷰 삭제
+     * @param reviewId
+     * @param customer
+     * @return 리뷰 ID
+     */
     @Transactional
     public Long deleteReview(Long reviewId, Customer customer) {
-
-        Review review = findReviewByIdAndCustomercheck(reviewId, customer);
+        Review review = findReviewById(reviewId);
+        checkValidateCustomer(customer, review);
 
         reviewRepository.delete(review);
 
         return review.getId();
     }
 
-
-
-
+    
     /* Util */
-
-    public Review findReviewByIdAndCustomercheck(Long reviewId, Customer customer) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(
-                () -> new ReviewException(ErrorType.NOT_FOUND_REVIEW)
-        );
+    
+    /**
+     * 리뷰 작성자 확인
+     * @param customer
+     * @param review
+     */
+    private static void checkValidateCustomer(Customer customer, Review review) {
         if (!customer.getId().equals(review.getCustomer().getId())) {
             throw new ReviewException(ErrorType.INVALID_ORDER_CUSTOMER);
         }
-
-        return review;
     }
     
+    /**
+     * 리뷰 조회
+     * @param reviewId
+     * @return 리뷰
+     */
     public Review findReviewById(Long reviewId) {
         return reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new LikeException(ErrorType.NOT_FOUND_REVIEW));
+            .orElseThrow(() -> new ReviewException(ErrorType.NOT_FOUND_REVIEW));
     }
 }

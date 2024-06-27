@@ -92,7 +92,7 @@ public class OrderService {
 	 * @return 주문 정보
 	 */
 	public OrderResponseDTO getOrderDetails(Long orderId, Customer customer) {
-		Order order = getOrder(orderId);
+		Order order = findOrderById(orderId);
 		checkValidateUser(order, customer);
 		
 		return new OrderResponseDTO(order);
@@ -106,7 +106,7 @@ public class OrderService {
 	 */
 	@Transactional
 	public Long cancelOrder(Long orderId, Customer customer) {
-		Order order = getOrder(orderId);
+		Order order = findOrderById(orderId);
 		checkValidateUser(order, customer);
 		
 		order.cancelOrder();
@@ -121,7 +121,7 @@ public class OrderService {
 	 * @param orderId
 	 * @return 주문
 	 */
-	private Order getOrder(Long orderId) {
+	public Order findOrderById(Long orderId) {
 		return orderRepository.findById(orderId).orElseThrow(() -> new OrderException(ErrorType.NOT_FOUND_ORDER));
 	}
 	

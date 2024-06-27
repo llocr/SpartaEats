@@ -17,15 +17,19 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
 public class ReviewController {
-
     private final ReviewService reviewService;
 
-    //리뷰 조회
+    /**
+     * 리뷰 전체 조회
+     * @param storeId
+     * @return ResponseEntity<ResponseMessage<List<ReviewResponseDto>>>
+     *     - statusCode: 200
+     *     - message: "모든 리뷰가 조회되었습니다."
+     *     - data: 리뷰 리스트
+     */
     @GetMapping("/stores/{storeId}/reviews")
     public ResponseEntity<ResponseMessage<List<ReviewResponseDto>>> getReview(@PathVariable Long storeId) {
-
         List<ReviewResponseDto> reviewList = reviewService.getReviews(storeId);
 
         ResponseMessage<List<ReviewResponseDto>> responseMessage = ResponseMessage.<List<ReviewResponseDto>>builder()
@@ -37,10 +41,18 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+    /**
+     * 리뷰 단건 조회
+     * @param storeId
+     * @param reviewId
+     * @return ResponseEntity<ResponseMessage<ReviewResponseDto>>
+     *     - statusCode: 200
+     *     - message: "해당 리뷰가 조회되었습니다."
+     *     - data: 리뷰 정보
+     */
     @GetMapping("/stores/{storeId}/reviews/{reviewId}")
     public ResponseEntity<ResponseMessage<ReviewResponseDto>> getReview(@PathVariable Long storeId,
                                                                         @PathVariable Long reviewId) {
-
         ReviewResponseDto responseDto = reviewService.getReview(storeId, reviewId);
 
         ResponseMessage<ReviewResponseDto> responseMessage = ResponseMessage.<ReviewResponseDto>builder()
@@ -52,7 +64,16 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
-    //리뷰 등록
+    /**
+     * 리뷰 작성
+     * @param orderId
+     * @param requestDto
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<ReviewResponseDto>>
+     *     - statusCode: 201
+     *     - message: "리뷰가 등록되었습니다."
+     *     - data: 리뷰 정보
+     */
     @PostMapping("/orders/{orderId}/reviews")
     public ResponseEntity<ResponseMessage<ReviewResponseDto>> addReview(@PathVariable Long orderId,
                                                                         @RequestBody @Valid ReviewAddRequestDto requestDto,
@@ -70,12 +91,20 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
     }
 
-    //리뷰 수정
+    /**
+     * 리뷰 수정
+     * @param reviewId
+     * @param requestDto
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<ReviewResponseDto>>
+     *     - statusCode: 200
+     *     - message: "리뷰가 수정 되었습니다."
+     *     - data: 리뷰 정보
+     */
     @PutMapping("/reviews/{reviewId}")
     public ResponseEntity<ResponseMessage<ReviewResponseDto>> updateReview(@PathVariable Long reviewId,
-                                                                           @RequestBody @Valid ReviewUpdateRequestDto requestDto,
-                                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
+                                                                            @RequestBody @Valid ReviewUpdateRequestDto requestDto,
+                                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         ReviewResponseDto responseDto = reviewService.updateReview(reviewId, requestDto, userDetails.getCustomer());
 
         ResponseMessage<ReviewResponseDto> responseMessage = ResponseMessage.<ReviewResponseDto>builder()
@@ -88,11 +117,18 @@ public class ReviewController {
     }
 
 
-    //리뷰 삭제
+    /**
+     * 리뷰 삭제
+     * @param reviewId
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<Long>>
+     *     - statusCode: 200
+     *     - message: "리뷰가 삭제 되었습니다."
+     *     - data: 리뷰 ID
+     */
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<ResponseMessage<Long>> deleteReview(@PathVariable Long reviewId,
-                                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
+                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Long deleteId = reviewService.deleteReview(reviewId, userDetails.getCustomer());
 
         ResponseMessage<Long> responseMessage = ResponseMessage.<Long>builder()
@@ -103,6 +139,5 @@ public class ReviewController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
-
-
+    
 }
