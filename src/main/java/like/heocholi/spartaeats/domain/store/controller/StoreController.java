@@ -18,7 +18,14 @@ import org.springframework.web.bind.annotation.*;
 public class StoreController {
     private final StoreService storeService;
 
-    // 음식점 상세 보기
+    /**
+     * 가게 상세 정보 보기
+     * @param storeId
+     * @return ResponseEntity<ResponseMessage<StoreResponseDto>>
+     *     - statusCode: 200
+     *     - message: "가게 상세 정보를 성공적으로 불러왔습니다."
+     *     - data: 가게 상세 정보
+     */
     @GetMapping("/{storeId}")
     public ResponseEntity<ResponseMessage<StoreResponseDto>> readStore(@PathVariable Long storeId) {
         StoreResponseDto responseDto = storeService.readStore(storeId);
@@ -33,8 +40,15 @@ public class StoreController {
 
     }
 
-    //음식점 리스트 보기
-    //주문이 많은 순서대로
+    /**
+     * 가게 리스트 불러오기
+     * @param type
+     * @param page
+     * @return ResponseEntity<ResponseMessage<StorePageResponseDto>>
+     *     - statusCode: 200
+     *     - message: "page번 페이지 가게 리스트를 성공적으로 불러왔습니다."
+     *     - data: 가게 리스트
+     */
     @GetMapping
     public ResponseEntity<ResponseMessage<StorePageResponseDto>> getStorePage (
             @RequestParam String type,
@@ -49,22 +63,4 @@ public class StoreController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
-
-    // 가게 찜 등록 || 취소
-    @PostMapping("/{storeId}/pick")
-    public ResponseEntity<ResponseMessage<PickStoreResponseDto>> managePicks
-            (@PathVariable Long storeId,
-             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        PickStoreResponseDto responseDto = storeService.managePicks(storeId, userDetails.getCustomer());
-
-        ResponseMessage<PickStoreResponseDto> responseMessage = ResponseMessage.<PickStoreResponseDto>builder()
-                .statusCode(HttpStatus.OK.value())
-                .message(storeId + "번 가게 찜 등록 / 취소가 완료되었습니다. ")
-                .data(responseDto)
-                .build();
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-    }
-
-
 }

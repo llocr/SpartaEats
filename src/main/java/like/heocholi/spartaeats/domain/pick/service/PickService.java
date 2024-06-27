@@ -1,5 +1,8 @@
 package like.heocholi.spartaeats.domain.pick.service;
 
+import like.heocholi.spartaeats.domain.store.dto.PickStoreResponseDto;
+import like.heocholi.spartaeats.domain.store.entity.Store;
+import like.heocholi.spartaeats.domain.store.service.StoreService;
 import like.heocholi.spartaeats.global.exception.ErrorType;
 import like.heocholi.spartaeats.domain.pick.dto.PickPageResponseDto;
 import like.heocholi.spartaeats.domain.customer.entity.Customer;
@@ -20,6 +23,46 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PickService {
     private final PickRepository pickRepository;
+    private final StoreService storeService;
+    
+    /**
+     * 가게 찜하기
+     * @param storeId
+     * @param customer
+     * @return 찜하기 결과
+     */
+    @Transactional
+    public PickStoreResponseDto managePicks(Long storeId, Customer customer) {
+        Store store = storeService.findStoreById(storeId);
+        Pick pick = updatePick(store, customer);
+        return new PickStoreResponseDto(store.getName(), pick.isPick());
+        
+    }
+    
+    /**
+     * 찜하기 업데이트
+     * @param store
+     * @param customer
+     * @return 찜하기 정보
+     */
+    public Pick updatePick(Store store, Customer customer) {
+        Pick pick = pickRepository.findByStoreAndCustomer(store, customer);
+        
+        if (pick != null) {
+            pick.update();
+        } else{
+            pick = Pick.builder()
+                .customer(customer)
+                .store(store)
+                .isPick(true)
+                .build();
+            
+            pickRepository.save(pick);
+        }
+        
+        return pick;
+    }
+    
 
     /**
      * 찜하기 리스트 불러오기
@@ -35,6 +78,8 @@ public class PickService {
         return new PickPageResponseDto(page, pickPage);
     }
 
+    /* util */
+    
     /**
      * 페이지 유효성 검사
      * @param page
