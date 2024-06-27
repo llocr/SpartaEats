@@ -17,6 +17,15 @@ public class PickController {
 
     private final PickService pickService;
 
+    /**
+     * 찜하기 리스트 불러오기
+     * @param userDetails
+     * @param page
+     * @return ResponseEntity<ResponseMessage<PickPageResponseDto>>
+     *     - statusCode: 200
+     *     - message: "찜하기 리스트를 성공적으로 불러왔습니다."
+     *     - data: 찜하기 리스트
+     */
     @GetMapping
     public ResponseEntity<ResponseMessage<PickPageResponseDto>> getPickList(
             @AuthenticationPrincipal UserDetailsImpl userDetails,

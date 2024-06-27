@@ -19,18 +19,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PickService {
-
     private final PickRepository pickRepository;
 
+    /**
+     * 찜하기 리스트 불러오기
+     * @param customer
+     * @param page
+     * @return 찜하기 리스트
+     */
     public PickPageResponseDto getPickList(Customer customer, Integer page) {
         Pageable pageable = PageRequest.of(page-1, 5);
         Page<Pick> pickPage = pickRepository.findAllByCustomerAndIsPickTrue(customer, pageable);
         checkValidatePage(page, pickPage);
 
         return new PickPageResponseDto(page, pickPage);
-
     }
 
+    /**
+     * 페이지 유효성 검사
+     * @param page
+     * @param pickPage
+     */
     private static void checkValidatePage(Integer page, Page<Pick> pickPage) {
         if (pickPage.getTotalElements() == 0) {
             throw new PickException(ErrorType.NOT_FOUND_PICK);
