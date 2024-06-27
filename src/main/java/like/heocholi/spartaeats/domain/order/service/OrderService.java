@@ -32,8 +32,10 @@ public class OrderService {
 	private final CartService cartService;
 	private final OrderMenuRepository orderMenuRepository;
 	
-	/*
-	 * 1. 주문하기
+	/**
+	 * 주문하기
+	 * @param customer
+	 * @return 주문 정보
 	 */
 	@Transactional
 	public OrderResponseDTO saveOrder(Customer customer) {
@@ -67,8 +69,11 @@ public class OrderService {
 		return new OrderResponseDTO(saveOrder);
 	}
 	
-	/*
-	 * 2. 주문 내역 조회
+	/**
+	 * 주문 목록 조회
+	 * @param page
+	 * @param customer
+	 * @return 주문 목록
 	 */
 	public OrderListResponseDTO getOrders(Integer page, Customer customer) {
 		Pageable pageable = createPageable(page);
@@ -80,8 +85,11 @@ public class OrderService {
 	}
 	
 	
-	/*
-	 * 3. 주문 상세 정보 조회
+	/**
+	 * 주문 상세 정보 조회
+	 * @param orderId
+	 * @param customer
+	 * @return 주문 정보
 	 */
 	public OrderResponseDTO getOrderDetails(Long orderId, Customer customer) {
 		Order order = getOrder(orderId);
@@ -90,8 +98,11 @@ public class OrderService {
 		return new OrderResponseDTO(order);
 	}
 	
-	/*
-	 * 4. 주문 취소하기
+	/**
+	 * 주문 취소
+	 * @param orderId
+	 * @param customer
+	 * @return 주문 ID
 	 */
 	@Transactional
 	public Long cancelOrder(Long orderId, Customer customer) {
@@ -103,15 +114,21 @@ public class OrderService {
 		return orderId;
 	}
 	
-	/*
-	 * 주문 내역 조회
+	/* util */
+	
+	/**
+	 * 주문 조회
+	 * @param orderId
+	 * @return 주문
 	 */
 	private Order getOrder(Long orderId) {
 		return orderRepository.findById(orderId).orElseThrow(() -> new OrderException(ErrorType.NOT_FOUND_ORDER));
 	}
 	
-	/*
-	 * 사용자 유효성 검사
+	/**
+	 * 주문 유효성 검사
+	 * @param order
+	 * @param customer
 	 */
 	private void checkValidateUser(Order order, Customer customer) {
 		if (!order.getCustomer().getId().equals(customer.getId())) {
@@ -119,15 +136,19 @@ public class OrderService {
 		}
 	}
 	
-	/*
-	 * 페이지네이션
+	/**
+	 * 페이지 생성
+	 * @param page
+	 * @return 페이지 정보
 	 */
 	private Pageable createPageable(Integer page) {
 		return PageRequest.of(page-1, 5, Sort.by("createdAt").descending());
 	}
 	
-	/*
+	/**
 	 * 페이지 유효성 검사
+	 * @param page
+	 * @param orderPage
 	 */
 	private static void checkValidatePage(Integer page, Page<Order> orderPage) {
 		if (orderPage.getTotalElements() == 0) {

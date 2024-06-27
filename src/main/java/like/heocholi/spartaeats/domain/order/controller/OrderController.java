@@ -24,7 +24,14 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 	private final OrderService orderService;
 	
-	// 주문 추가
+	/**
+	 * 주문하기
+	 * @param userDetails
+	 * @return ResponseEntity<ResponseMessage<OrderResponseDTO>>
+	 *     - statusCode: 201
+	 *     - message: "주문이 완료되었습니다."
+	 *     - data: 주문 정보
+	 */
 	@PostMapping
 	public ResponseEntity<ResponseMessage<OrderResponseDTO>> addOrder(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		OrderResponseDTO responseDTO = orderService.saveOrder(userDetails.getCustomer());
@@ -38,7 +45,15 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}
 	
-	// 주문 목록 불러오기
+	/**
+	 * 주문 목록 불러오기
+	 * @param page
+	 * @param userDetails
+	 * @return ResponseEntity<ResponseMessage<OrderListResponseDTO>>
+	 *     - statusCode: 200
+	 *     - message: "주문 목록을 불러왔습니다."
+	 *     - data: 주문 목록
+	 */
 	@GetMapping
 	public ResponseEntity<ResponseMessage<OrderListResponseDTO>> getOrder(
 		@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
@@ -55,7 +70,15 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
 	}
 	
-	// 주문 상세 정보 불러오기
+	/**
+	 * 주문 상세 정보 불러오기
+	 * @param id
+	 * @param userDetails
+	 * @return ResponseEntity<ResponseMessage<OrderResponseDTO>>
+	 *     - statusCode: 200
+	 *     - message: "주문 상세 정보를 불러왔습니다."
+	 *     - data: 주문 상세 정보
+	 */
 	@GetMapping("/{id}")
 	public ResponseEntity<ResponseMessage<OrderResponseDTO>> getOrderDetail(@PathVariable Long id,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -71,7 +94,15 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
 	}
 	
-	// 주문 취소하기
+	/**
+	 * 주문 취소하기
+	 * @param id
+	 * @param userDetails
+	 * @return ResponseEntity<ResponseMessage<Long>>
+	 *     - statusCode: 200
+	 *     - message: "주문이 취소되었습니다."
+	 *     - data: 주문 ID
+	 */
 	@PutMapping("/{id}")
 	public ResponseEntity<ResponseMessage<Long>> cancelOrder(@PathVariable Long id,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
