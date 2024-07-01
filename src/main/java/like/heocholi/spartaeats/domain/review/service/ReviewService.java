@@ -128,6 +128,14 @@ public class ReviewService {
         return new ReviewListResponseDTO(page, reviewPage);
     }
     
+    public ReviewListResponseDTO pickReviews(Integer page, String sort, Customer customer) {
+        Pageable pageable = PageUtil.createPageable(page, Sort.by(sort));
+        Page<Review> reviewPage = reviewJpaRepository.findPickReview(customer.getId(), pageable);
+        PageUtil.checkValidatePage(page, reviewPage);
+        
+        return new ReviewListResponseDTO(page, reviewPage);
+    }
+    
     /* Util */
     
     /**

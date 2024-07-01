@@ -1,12 +1,15 @@
 package like.heocholi.spartaeats.domain.review.repository;
 
 import static like.heocholi.spartaeats.domain.like.entity.QLike.like;
+import static like.heocholi.spartaeats.domain.pick.entity.QPick.*;
 import static like.heocholi.spartaeats.domain.review.entity.QReview.review;
+import static like.heocholi.spartaeats.domain.store.entity.QStore.store;
 
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +18,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import like.heocholi.spartaeats.domain.pick.entity.QPick;
 import like.heocholi.spartaeats.domain.review.entity.Review;
 
 @Repository
@@ -45,6 +49,39 @@ public class ReviewJpaRepository {
 			.selectFrom(review)
 			.join(like).on(like.review.id.eq(review.id))
 			.where(like.isLike.isTrue().and(like.customer.id.eq(userId)));
+		
+		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
+	}
+	
+	// 찜하기 한 가게의 리뷰 목록 조회
+	public Page<Review> findPickReview(Long userId, Pageable pageable) {
+		// 기본 정렬 조건 설정
+		OrderSpecifier<?> sortedColumn = review.createdAt.desc();
+		
+		// 정렬 조건 확인 및 설정
+		for (Sort.Order order : pageable.getSort()) {
+			if (order.getProperty().equals("userId")) {
+				sortedColumn = review.customer.id.asc();
+			} else if (order.getProperty().equals("name")) {
+				sortedColumn = review.store.name.asc();
+			}
+		}
+		
+		List<Review> content = queryFactory
+			.selectFrom(review)
+			.join(review.store, store)
+			.join(pick).on(pick.store.id.eq(store.id))
+			.where(pick.isPick.isTrue().and(pick.customer.id.eq(userId)))
+			.orderBy(sortedColumn)
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+		
+		JPAQuery<Review> countQuery = queryFactory
+			.selectFrom(review)
+			.join(review.store, store)
+			.join(pick).on(pick.store.id.eq(store.id))
+			.where(pick.isPick.isTrue().and(pick.customer.id.eq(userId)));
 		
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
 	}

@@ -155,4 +155,20 @@ public class ReviewController {
         
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
+    
+    @GetMapping("/reviews/picks")
+    public ResponseEntity<ResponseMessage<ReviewListResponseDTO>> pickReviews(
+        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @RequestParam(value = "sort", required = false, defaultValue = "createdAt") String sort,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ReviewListResponseDTO responseDto = reviewService.pickReviews(page, sort, userDetails.getCustomer());
+        
+        ResponseMessage<ReviewListResponseDTO> responseMessage = ResponseMessage.<ReviewListResponseDTO>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("찜한 리뷰가 조회되었습니다.")
+                .data(responseDto)
+                .build();
+        
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 }
