@@ -12,6 +12,10 @@ public class PageUtil {
 	public static final int DEFAULT_PAGE_SIZE = 5;
 	
 	public static Pageable createPageable(Integer page, Sort sort) {
+		if (page < 1) {
+			throw new PageException(ErrorType.INVALID_PAGE);
+		}
+		
 		return PageRequest.of(page - 1, DEFAULT_PAGE_SIZE, sort);
 	}
 	
