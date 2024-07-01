@@ -6,6 +6,7 @@ import like.heocholi.spartaeats.domain.customer.dto.ProfileRequestDTO;
 import like.heocholi.spartaeats.domain.customer.dto.ProfileResponseDTO;
 import like.heocholi.spartaeats.domain.customer.entity.Customer;
 import like.heocholi.spartaeats.domain.customer.entity.PasswordHistory;
+import like.heocholi.spartaeats.domain.customer.repository.CustomerJpaRepository;
 import like.heocholi.spartaeats.global.exception.ErrorType;
 import like.heocholi.spartaeats.domain.customer.enums.UserStatus;
 import like.heocholi.spartaeats.domain.customer.dto.SignupRequestDto;
@@ -28,6 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final CustomerJpaRepository customerJpaRepository;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final PasswordEncoder passwordEncoder;
     
@@ -101,7 +103,8 @@ public class CustomerService {
      * @return 프로필 조회 결과
      */
     public CustomerResponseDTO getCustomerInfo(Customer customer) {
-        return new CustomerResponseDTO(customer);
+        long likeReviewCount = customerJpaRepository.findLikeReviewCount(customer.getId());
+        return new CustomerResponseDTO(customer, likeReviewCount);
     }
 
 
