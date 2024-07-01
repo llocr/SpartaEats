@@ -12,7 +12,7 @@ public class PickResponseDto {
     private String address;
 
     public PickResponseDto(Pick pick) {
-        storeId = pick.getStore().getId();
+        this.storeId = pick.getStore().getId();
         this.name = pick.getStore().getName();
         this.address = pick.getStore().getAddress();
     }

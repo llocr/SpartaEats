@@ -1,11 +1,12 @@
 package like.heocholi.spartaeats.domain.store.service;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import like.heocholi.spartaeats.domain.common.util.page.PageUtil;
 import like.heocholi.spartaeats.domain.menu.exception.MenuException;
 import like.heocholi.spartaeats.domain.pick.repository.PickRepository;
 import like.heocholi.spartaeats.domain.store.dto.StorePageResponseDto;
@@ -15,7 +16,6 @@ import like.heocholi.spartaeats.domain.store.enums.RestaurantType;
 import like.heocholi.spartaeats.domain.store.exception.StoreException;
 import like.heocholi.spartaeats.domain.store.repository.StoreRepository;
 import like.heocholi.spartaeats.global.exception.ErrorType;
-import like.heocholi.spartaeats.global.exception.PageException;
 import lombok.RequiredArgsConstructor;
 
 
@@ -43,17 +43,16 @@ public class StoreService {
      */
     public StorePageResponseDto getStorePageByType(String type, Integer page) {
         RestaurantType restaurantType = checkValidateType(type);
-        Pageable pageable = PageRequest.of(page - 1, 5);
+        Pageable pageable = PageUtil.createPageable(page, Sort.by("createdAt").descending());
 
         Page<Store> storePageList = storeRepository.findByTypeGroupedByStoreOrderByOrderCountDesc(restaurantType, pageable);
 
-        checkValidatePage(page, storePageList);
+        PageUtil.checkValidatePage(page, storePageList);
 
         return new StorePageResponseDto(page, storePageList);
     }
     
     /* util */
-    
     
     /**
      * 가게 조회
@@ -80,20 +79,5 @@ public class StoreService {
         }
         
         return restaurantType;
-    }
-    
-    /**
-     * 페이지 유효성 검사
-     * @param page
-     * @param storePageList
-     */
-    private static void checkValidatePage(Integer page, Page<Store> storePageList) {
-        if (storePageList.getTotalElements() == 0) {
-            throw new StoreException(ErrorType.NOT_FOUND_STORES);
-        }
-        
-        if (page > storePageList.getTotalPages() || page < 1) {
-            throw new PageException(ErrorType.INVALID_PAGE);
-        }
     }
 }

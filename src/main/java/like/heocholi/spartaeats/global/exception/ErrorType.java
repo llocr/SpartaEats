@@ -30,6 +30,7 @@ public enum ErrorType {
     
     //page
     INVALID_PAGE(HttpStatus.BAD_REQUEST, "페이지 번호가 올바르지 않습니다."),
+    NOT_FOUND_PAGE(HttpStatus.NOT_FOUND, "페이지가 존재하지 않습니다."),
 
     // cart
     INVALID_CART(HttpStatus.BAD_REQUEST, "장바구니에는 같은 가게의 메뉴만 담을 수 있습니다."),

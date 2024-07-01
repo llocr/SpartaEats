@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import like.heocholi.spartaeats.domain.common.util.page.PageUtil;
 import like.heocholi.spartaeats.global.exception.ErrorType;
 import like.heocholi.spartaeats.domain.cart.service.CartService;
 import like.heocholi.spartaeats.domain.order.dto.OrderListResponseDTO;
@@ -76,10 +77,9 @@ public class OrderService {
 	 * @return 주문 목록
 	 */
 	public OrderListResponseDTO getOrders(Integer page, Customer customer) {
-		Pageable pageable = createPageable(page);
+		Pageable pageable = PageUtil.createPageable(page, Sort.by("createdAt").descending());
 		Page<Order> orderPage = orderRepository.findAllByCustomer(customer, pageable);
-		
-		checkValidatePage(page, orderPage);
+		PageUtil.checkValidatePage(page, orderPage);
 		
 		return new OrderListResponseDTO(page, orderPage);
 	}
@@ -133,30 +133,6 @@ public class OrderService {
 	private void checkValidateUser(Order order, Customer customer) {
 		if (!order.getCustomer().getId().equals(customer.getId())) {
 			throw new OrderException(ErrorType.INVALID_ORDER_CUSTOMER);
-		}
-	}
-	
-	/**
-	 * 페이지 생성
-	 * @param page
-	 * @return 페이지 정보
-	 */
-	private Pageable createPageable(Integer page) {
-		return PageRequest.of(page-1, 5, Sort.by("createdAt").descending());
-	}
-	
-	/**
-	 * 페이지 유효성 검사
-	 * @param page
-	 * @param orderPage
-	 */
-	private static void checkValidatePage(Integer page, Page<Order> orderPage) {
-		if (orderPage.getTotalElements() == 0) {
-			throw new OrderException(ErrorType.NOT_FOUND_ORDER);
-		}
-		
-		if (page > orderPage.getTotalPages() || page < 1) {
-			throw new PageException(ErrorType.INVALID_PAGE);
 		}
 	}
 }
