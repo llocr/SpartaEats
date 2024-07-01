@@ -2,17 +2,23 @@ package like.heocholi.spartaeats.domain.review.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import like.heocholi.spartaeats.domain.common.util.page.PageUtil;
 import like.heocholi.spartaeats.domain.customer.entity.Customer;
 import like.heocholi.spartaeats.domain.order.entity.Order;
 import like.heocholi.spartaeats.domain.order.service.OrderService;
 import like.heocholi.spartaeats.domain.review.dto.ReviewAddRequestDto;
+import like.heocholi.spartaeats.domain.review.dto.ReviewListResponseDTO;
 import like.heocholi.spartaeats.domain.review.dto.ReviewResponseDto;
 import like.heocholi.spartaeats.domain.review.dto.ReviewUpdateRequestDto;
 import like.heocholi.spartaeats.domain.review.entity.Review;
 import like.heocholi.spartaeats.domain.review.exception.ReviewException;
+import like.heocholi.spartaeats.domain.review.repository.ReviewJpaRepository;
 import like.heocholi.spartaeats.domain.review.repository.ReviewRepository;
 import like.heocholi.spartaeats.domain.store.entity.Store;
 import like.heocholi.spartaeats.domain.store.service.StoreService;
@@ -23,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
+    private final ReviewJpaRepository reviewJpaRepository;
     private final OrderService orderService;
     private final StoreService storeService;
     
@@ -112,7 +119,14 @@ public class ReviewService {
 
         return review.getId();
     }
-
+    
+    public ReviewListResponseDTO likeReviews(Integer page, Customer customer) {
+        Pageable pageable = PageUtil.createPageable(page, Sort.by("createdAt").descending());
+        Page<Review> reviewPage = reviewJpaRepository.findLikeReview(customer.getId(), pageable);
+        PageUtil.checkValidatePage(page, reviewPage);
+        
+        return new ReviewListResponseDTO(page, reviewPage);
+    }
     
     /* Util */
     

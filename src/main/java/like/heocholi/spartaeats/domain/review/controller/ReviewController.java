@@ -3,6 +3,7 @@ package like.heocholi.spartaeats.domain.review.controller;
 import jakarta.validation.Valid;
 import like.heocholi.spartaeats.domain.common.dto.ResponseMessage;
 import like.heocholi.spartaeats.domain.review.dto.ReviewAddRequestDto;
+import like.heocholi.spartaeats.domain.review.dto.ReviewListResponseDTO;
 import like.heocholi.spartaeats.domain.review.dto.ReviewResponseDto;
 import like.heocholi.spartaeats.domain.review.dto.ReviewUpdateRequestDto;
 import like.heocholi.spartaeats.global.security.UserDetailsImpl;
@@ -140,4 +141,18 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
     
+    @GetMapping("/reviews/likes")
+    public ResponseEntity<ResponseMessage<ReviewListResponseDTO>> likeReviews(
+        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ReviewListResponseDTO responseDto = reviewService.likeReviews(page, userDetails.getCustomer());
+        
+        ResponseMessage<ReviewListResponseDTO> responseMessage = ResponseMessage.<ReviewListResponseDTO>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("좋아요한 리뷰가 조회되었습니다.")
+                .data(responseDto)
+                .build();
+        
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 }
