@@ -1,35 +1,34 @@
 package like.heocholi.spartaeats.domain.customer.service;
 
-import like.heocholi.spartaeats.domain.customer.dto.CustomerResponseDTO;
-import like.heocholi.spartaeats.domain.customer.dto.PasswordRequestDTO;
-import like.heocholi.spartaeats.domain.customer.dto.ProfileRequestDTO;
-import like.heocholi.spartaeats.domain.customer.dto.ProfileResponseDTO;
-import like.heocholi.spartaeats.domain.customer.entity.Customer;
-import like.heocholi.spartaeats.domain.customer.entity.PasswordHistory;
-import like.heocholi.spartaeats.domain.customer.repository.CustomerJpaRepository;
-import like.heocholi.spartaeats.global.exception.ErrorType;
-import like.heocholi.spartaeats.domain.customer.enums.UserStatus;
-import like.heocholi.spartaeats.domain.customer.dto.SignupRequestDto;
-import like.heocholi.spartaeats.domain.customer.dto.SignupResponseDto;
-import like.heocholi.spartaeats.domain.customer.dto.WithdrawRequestDto;
-import like.heocholi.spartaeats.domain.customer.exception.PasswordException;
-import like.heocholi.spartaeats.domain.customer.exception.CustomerException;
-import like.heocholi.spartaeats.domain.customer.repository.CustomerRepository;
-import like.heocholi.spartaeats.domain.customer.repository.PasswordHistoryRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import like.heocholi.spartaeats.domain.customer.dto.CustomerResponseDTO;
+import like.heocholi.spartaeats.domain.customer.dto.PasswordRequestDTO;
+import like.heocholi.spartaeats.domain.customer.dto.ProfileRequestDTO;
+import like.heocholi.spartaeats.domain.customer.dto.ProfileResponseDTO;
+import like.heocholi.spartaeats.domain.customer.dto.SignupRequestDto;
+import like.heocholi.spartaeats.domain.customer.dto.SignupResponseDto;
+import like.heocholi.spartaeats.domain.customer.dto.WithdrawRequestDto;
+import like.heocholi.spartaeats.domain.customer.entity.Customer;
+import like.heocholi.spartaeats.domain.customer.entity.PasswordHistory;
+import like.heocholi.spartaeats.domain.customer.enums.UserStatus;
+import like.heocholi.spartaeats.domain.customer.exception.CustomerException;
+import like.heocholi.spartaeats.domain.customer.exception.PasswordException;
+import like.heocholi.spartaeats.domain.customer.repository.CustomerRepository;
+import like.heocholi.spartaeats.domain.customer.repository.PasswordHistoryRepository;
+import like.heocholi.spartaeats.global.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
-    private final CustomerJpaRepository customerJpaRepository;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final PasswordEncoder passwordEncoder;
     
@@ -103,7 +102,7 @@ public class CustomerService {
      * @return 프로필 조회 결과
      */
     public CustomerResponseDTO getCustomerInfo(Customer customer) {
-        long likeReviewCount = customerJpaRepository.findLikeReviewCount(customer.getId());
+        long likeReviewCount = customerRepository.findLikeReviewCount(customer.getId());
         return new CustomerResponseDTO(customer, likeReviewCount);
     }
 

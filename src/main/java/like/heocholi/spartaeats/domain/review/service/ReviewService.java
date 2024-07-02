@@ -18,7 +18,6 @@ import like.heocholi.spartaeats.domain.review.dto.ReviewResponseDto;
 import like.heocholi.spartaeats.domain.review.dto.ReviewUpdateRequestDto;
 import like.heocholi.spartaeats.domain.review.entity.Review;
 import like.heocholi.spartaeats.domain.review.exception.ReviewException;
-import like.heocholi.spartaeats.domain.review.repository.ReviewJpaRepository;
 import like.heocholi.spartaeats.domain.review.repository.ReviewRepository;
 import like.heocholi.spartaeats.domain.store.entity.Store;
 import like.heocholi.spartaeats.domain.store.service.StoreService;
@@ -29,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
-    private final ReviewJpaRepository reviewJpaRepository;
     private final OrderService orderService;
     private final StoreService storeService;
     
@@ -122,7 +120,7 @@ public class ReviewService {
     
     public ReviewListResponseDTO likeReviews(Integer page, Customer customer) {
         Pageable pageable = PageUtil.createPageable(page, Sort.by("createdAt").descending());
-        Page<Review> reviewPage = reviewJpaRepository.findLikeReview(customer.getId(), pageable);
+        Page<Review> reviewPage = reviewRepository.findLikeReview(customer.getId(), pageable);
         PageUtil.checkValidatePage(page, reviewPage);
         
         return new ReviewListResponseDTO(page, reviewPage);
@@ -130,7 +128,7 @@ public class ReviewService {
     
     public ReviewListResponseDTO pickReviews(Integer page, String sort, Customer customer) {
         Pageable pageable = PageUtil.createPageable(page, Sort.by(sort));
-        Page<Review> reviewPage = reviewJpaRepository.findPickReview(customer.getId(), pageable);
+        Page<Review> reviewPage = reviewRepository.findPickReview(customer.getId(), pageable);
         PageUtil.checkValidatePage(page, reviewPage);
         
         return new ReviewListResponseDTO(page, reviewPage);

@@ -9,7 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
 @Repository
-public class CustomerJpaRepository {
+public class CustomerJpaRepository implements CustomerRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 	
 	public CustomerJpaRepository(EntityManager em) {

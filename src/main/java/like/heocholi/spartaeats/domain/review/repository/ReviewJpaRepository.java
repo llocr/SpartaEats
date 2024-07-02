@@ -1,7 +1,7 @@
 package like.heocholi.spartaeats.domain.review.repository;
 
 import static like.heocholi.spartaeats.domain.like.entity.QLike.like;
-import static like.heocholi.spartaeats.domain.pick.entity.QPick.*;
+import static like.heocholi.spartaeats.domain.pick.entity.QPick.pick;
 import static like.heocholi.spartaeats.domain.review.entity.QReview.review;
 import static like.heocholi.spartaeats.domain.store.entity.QStore.store;
 
@@ -18,11 +18,10 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-import like.heocholi.spartaeats.domain.pick.entity.QPick;
 import like.heocholi.spartaeats.domain.review.entity.Review;
 
 @Repository
-public class ReviewJpaRepository {
+public class ReviewJpaRepository implements ReviewRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 	
 	public ReviewJpaRepository(EntityManager em) {
