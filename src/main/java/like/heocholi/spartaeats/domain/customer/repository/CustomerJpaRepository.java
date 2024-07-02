@@ -16,7 +16,11 @@ public class CustomerJpaRepository implements CustomerRepositoryCustom {
 		this.queryFactory = new JPAQueryFactory(em);
 	}
 	
-	// 좋아요 누른 리뷰 수 조회
+	/**
+	 * 좋아요한 리뷰 개수 조회
+	 * @param userId 사용자 ID
+	 * @return long
+	 */
 	public long findLikeReviewCount(Long userId) {
 		return queryFactory
 			.select(like)

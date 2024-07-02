@@ -141,6 +141,15 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
     
+    /**
+     * 좋아요한 리뷰 조회
+     * @param page
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<ReviewListResponseDTO>>
+     *     - statusCode: 200
+     *     - message: "좋아요한 리뷰가 조회되었습니다."
+     *     - data: 리뷰 리스트
+     */
     @GetMapping("/reviews/likes")
     public ResponseEntity<ResponseMessage<ReviewListResponseDTO>> likeReviews(
         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
@@ -156,6 +165,16 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
     
+    /**
+     * 찜한 리뷰 조회
+     * @param page
+     * @param sort
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<ReviewListResponseDTO>>
+     *     - statusCode: 200
+     *     - message: "찜한 가게의 리뷰가 조회되었습니다."
+     *     - data: 리뷰 리스트
+     */
     @GetMapping("/reviews/picks")
     public ResponseEntity<ResponseMessage<ReviewListResponseDTO>> pickReviews(
         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
@@ -165,7 +184,7 @@ public class ReviewController {
         
         ResponseMessage<ReviewListResponseDTO> responseMessage = ResponseMessage.<ReviewListResponseDTO>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("찜한 리뷰가 조회되었습니다.")
+                .message("찜한 가게의 리뷰가 조회되었습니다.")
                 .data(responseDto)
                 .build();
         

@@ -28,7 +28,12 @@ public class ReviewJpaRepository implements ReviewRepositoryCustom {
 		this.queryFactory = new JPAQueryFactory(em);
 	}
 	
-	// 좋아요 한 리뷰 조회
+	/**
+	 * 좋아요한 리뷰 목록 조회
+	 * @param userId 사용자 ID
+	 * @param pageable 페이징 정보
+	 * @return Page<Review>
+	 */
 	public Page<Review> findLikeReview(Long userId, Pageable pageable) {
 		// 페이징 및 정렬
 		OrderSpecifier<?> sortedColumn = review.createdAt.desc();  // 기본값 설정
@@ -52,7 +57,12 @@ public class ReviewJpaRepository implements ReviewRepositoryCustom {
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
 	}
 	
-	// 찜하기 한 가게의 리뷰 목록 조회
+	/**
+	 * 찜한 가게의 리뷰 목록 조회
+	 * @param userId 사용자 ID
+	 * @param pageable 페이징 정보
+	 * @return Page<Review>
+	 */
 	public Page<Review> findPickReview(Long userId, Pageable pageable) {
 		// 기본 정렬 조건 설정
 		OrderSpecifier<?> sortedColumn = review.createdAt.desc();

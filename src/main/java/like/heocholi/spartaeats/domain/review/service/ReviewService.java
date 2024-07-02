@@ -118,6 +118,12 @@ public class ReviewService {
         return review.getId();
     }
     
+    /**
+     * 좋아요한 리뷰 조회
+     * @param page
+     * @param customer
+     * @return 리뷰 리스트
+     */
     public ReviewListResponseDTO likeReviews(Integer page, Customer customer) {
         Pageable pageable = PageUtil.createPageable(page, Sort.by("createdAt").descending());
         Page<Review> reviewPage = reviewRepository.findLikeReview(customer.getId(), pageable);
@@ -126,6 +132,13 @@ public class ReviewService {
         return new ReviewListResponseDTO(page, reviewPage);
     }
     
+    /**
+     * 찜한 가게의 리뷰 조회
+     * @param page
+     * @param sort
+     * @param customer
+     * @return 리뷰 리스트
+     */
     public ReviewListResponseDTO pickReviews(Integer page, String sort, Customer customer) {
         Pageable pageable = PageUtil.createPageable(page, Sort.by(sort));
         Page<Review> reviewPage = reviewRepository.findPickReview(customer.getId(), pageable);
