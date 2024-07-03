@@ -39,7 +39,7 @@ public enum ErrorType {
     NOT_FOUND_CART_MENU(HttpStatus.NOT_FOUND, "장바구니에 해당 메뉴가 존재하지 않습니다."),
     
     // menu
-    NOT_FOUND_STORE(HttpStatus.NOT_FOUND,"선택한 음식점이 존재하지 않습니다."),
+    NOT_FOUND_STORE(HttpStatus.NOT_FOUND,"음식점이 존재하지 않습니다."),
     NOT_FOUND_MENUS(HttpStatus.NOT_FOUND,"메뉴가 없습니다."),
     NOT_FOUND_MENU(HttpStatus.NOT_FOUND,"해당 메뉴가 존재하지 않습니다."),
 
@@ -52,7 +52,6 @@ public enum ErrorType {
     //like
     INVALID_LIKE(HttpStatus.BAD_REQUEST, "본인이 작성한 리뷰에는 좋아요를 할 수 없습니다."),
     
-      
     //store
     INVALID_TYPE(HttpStatus.BAD_REQUEST, "타입이 올바르지 않습니다."),
     NOT_FOUND_STORES(HttpStatus.NOT_FOUND,"음식점이 존재하지 않습니다."),

@@ -1,5 +1,7 @@
 package like.heocholi.spartaeats.domain.store.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -11,6 +13,7 @@ import like.heocholi.spartaeats.domain.menu.exception.MenuException;
 import like.heocholi.spartaeats.domain.pick.repository.PickRepository;
 import like.heocholi.spartaeats.domain.store.dto.StorePageResponseDto;
 import like.heocholi.spartaeats.domain.store.dto.StoreResponseDto;
+import like.heocholi.spartaeats.domain.store.dto.StoreTopPickResponseDTO;
 import like.heocholi.spartaeats.domain.store.entity.Store;
 import like.heocholi.spartaeats.domain.store.enums.RestaurantType;
 import like.heocholi.spartaeats.domain.store.exception.StoreException;
@@ -50,6 +53,20 @@ public class StoreService {
         PageUtil.checkValidatePage(page, storePageList);
 
         return new StorePageResponseDto(page, storePageList);
+    }
+    
+    /**
+     * 인기 가게 리스트 조회
+     * @return 인기 가게 리스트
+     */
+    public List<StoreTopPickResponseDTO> getTopPicks() {
+        List<StoreTopPickResponseDTO> topPicks = storeRepository.findTopPicks();
+        
+        if (topPicks.isEmpty()) {
+            throw new StoreException(ErrorType.NOT_FOUND_STORE);
+        }
+        
+        return topPicks;
     }
     
     /* util */
