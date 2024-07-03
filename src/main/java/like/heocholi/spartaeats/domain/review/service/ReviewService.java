@@ -15,6 +15,7 @@ import like.heocholi.spartaeats.domain.order.service.OrderService;
 import like.heocholi.spartaeats.domain.review.dto.ReviewAddRequestDto;
 import like.heocholi.spartaeats.domain.review.dto.ReviewListResponseDTO;
 import like.heocholi.spartaeats.domain.review.dto.ReviewResponseDto;
+import like.heocholi.spartaeats.domain.review.dto.ReviewSearchCond;
 import like.heocholi.spartaeats.domain.review.dto.ReviewUpdateRequestDto;
 import like.heocholi.spartaeats.domain.review.entity.Review;
 import like.heocholi.spartaeats.domain.review.exception.ReviewException;
@@ -139,9 +140,9 @@ public class ReviewService {
      * @param customer
      * @return 리뷰 리스트
      */
-    public ReviewListResponseDTO pickReviews(Integer page, String sort, Customer customer) {
+    public ReviewListResponseDTO pickReviews(Integer page, String sort, ReviewSearchCond reviewSearchCond, Customer customer) {
         Pageable pageable = PageUtil.createPageable(page, Sort.by(sort));
-        Page<Review> reviewPage = reviewRepository.findPickReview(customer.getId(), pageable);
+        Page<Review> reviewPage = reviewRepository.findPickReview(reviewSearchCond, customer.getId(), pageable);
         PageUtil.checkValidatePage(page, reviewPage);
         
         return new ReviewListResponseDTO(page, reviewPage);

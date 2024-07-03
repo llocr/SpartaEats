@@ -13,10 +13,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import like.heocholi.spartaeats.domain.review.dto.ReviewSearchCond;
 import like.heocholi.spartaeats.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 
@@ -62,7 +64,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	 * @return Page<Review>
 	 */
 	@Override
-	public Page<Review> findPickReview(Long userId, Pageable pageable) {
+	public Page<Review> findPickReview(ReviewSearchCond cond, Long userId, Pageable pageable) {
 		// 기본 정렬 조건 설정
 		OrderSpecifier<?> sortedColumn = review.createdAt.desc();
 		
@@ -75,11 +77,15 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			}
 		}
 		
+		BooleanBuilder builder = getBooleanBuilder(cond);
+		
 		List<Review> content = queryFactory
 			.selectFrom(review)
 			.join(review.store, store)
 			.join(pick).on(pick.store.id.eq(store.id))
-			.where(pick.isPick.isTrue().and(pick.customer.id.eq(userId)))
+			.where(pick.isPick.isTrue()
+				.and(pick.customer.id.eq(userId))
+				.and(builder))
 			.orderBy(sortedColumn)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -89,8 +95,29 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			.selectFrom(review)
 			.join(review.store, store)
 			.join(pick).on(pick.store.id.eq(store.id))
-			.where(pick.isPick.isTrue().and(pick.customer.id.eq(userId)));
-		
+			.where(pick.isPick.isTrue().and(pick.customer.id.eq(userId)).and(builder));
+		 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
+	}
+	
+	/**
+	 * 검색 조건에 따른 BooleanBuilder 생성
+	 * @param cond 검색 조건
+	 * @return BooleanBuilder
+	 */
+	private static BooleanBuilder getBooleanBuilder(ReviewSearchCond cond) {
+		BooleanBuilder builder = new BooleanBuilder();
+		
+		if (cond.getStoreName() != null) {
+			builder.and(review.store.name.like("%" + cond.getStoreName() + "%"));
+		}
+		if (cond.getAddress() != null) {
+			builder.and(review.store.address.like("%" + cond.getAddress() + "%"));
+		}
+		if (cond.getRestaurantType() != null) {
+			builder.and(review.store.type.stringValue().like(cond.getRestaurantType()));
+		}
+		
+		return builder;
 	}
 }

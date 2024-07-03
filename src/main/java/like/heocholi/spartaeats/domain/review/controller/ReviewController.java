@@ -5,6 +5,7 @@ import like.heocholi.spartaeats.domain.common.dto.ResponseMessage;
 import like.heocholi.spartaeats.domain.review.dto.ReviewAddRequestDto;
 import like.heocholi.spartaeats.domain.review.dto.ReviewListResponseDTO;
 import like.heocholi.spartaeats.domain.review.dto.ReviewResponseDto;
+import like.heocholi.spartaeats.domain.review.dto.ReviewSearchCond;
 import like.heocholi.spartaeats.domain.review.dto.ReviewUpdateRequestDto;
 import like.heocholi.spartaeats.global.security.UserDetailsImpl;
 import like.heocholi.spartaeats.domain.review.service.ReviewService;
@@ -166,9 +167,10 @@ public class ReviewController {
     }
     
     /**
-     * 찜한 리뷰 조회
+     * 찜한 가게 리뷰 조회
      * @param page
      * @param sort
+     * @param reviewSearchCond
      * @param userDetails
      * @return ResponseEntity<ResponseMessage<ReviewListResponseDTO>>
      *     - statusCode: 200
@@ -179,8 +181,9 @@ public class ReviewController {
     public ResponseEntity<ResponseMessage<ReviewListResponseDTO>> pickReviews(
         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
         @RequestParam(value = "sort", required = false, defaultValue = "createdAt") String sort,
+        @RequestBody ReviewSearchCond reviewSearchCond,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        ReviewListResponseDTO responseDto = reviewService.pickReviews(page, sort, userDetails.getCustomer());
+        ReviewListResponseDTO responseDto = reviewService.pickReviews(page, sort, reviewSearchCond, userDetails.getCustomer());
         
         ResponseMessage<ReviewListResponseDTO> responseMessage = ResponseMessage.<ReviewListResponseDTO>builder()
                 .statusCode(HttpStatus.OK.value())
