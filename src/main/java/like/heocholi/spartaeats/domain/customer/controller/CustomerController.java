@@ -1,5 +1,7 @@
 package like.heocholi.spartaeats.domain.customer.controller;
 
+import java.io.IOException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -8,7 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
 import like.heocholi.spartaeats.domain.common.dto.ResponseMessage;
@@ -160,6 +164,22 @@ public class CustomerController {
                 .data(responseDTO)
                 .build();
 
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+    
+    @PostMapping("/profile")
+    public ResponseEntity<ResponseMessage<Long>> uploadProfile(
+        @RequestPart(value = "image") MultipartFile file,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        
+        Long responseDTO = customerService.uploadProfileImage(file, userDetails.getCustomer());
+        
+        ResponseMessage<Long> responseMessage = ResponseMessage.<Long>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("프로필 사진 업로드가 완료되었습니다.")
+            .data(responseDTO)
+            .build();
+        
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 }

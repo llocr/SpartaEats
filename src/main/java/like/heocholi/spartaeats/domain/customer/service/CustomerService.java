@@ -1,12 +1,15 @@
 package like.heocholi.spartaeats.domain.customer.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import like.heocholi.spartaeats.domain.common.service.S3Service;
 import like.heocholi.spartaeats.domain.customer.dto.CustomerResponseDTO;
 import like.heocholi.spartaeats.domain.customer.dto.PasswordRequestDTO;
 import like.heocholi.spartaeats.domain.customer.dto.ProfileRequestDTO;
@@ -22,6 +25,7 @@ import like.heocholi.spartaeats.domain.customer.exception.PasswordException;
 import like.heocholi.spartaeats.domain.customer.repository.CustomerRepository;
 import like.heocholi.spartaeats.domain.customer.repository.PasswordHistoryRepository;
 import like.heocholi.spartaeats.global.exception.ErrorType;
+import like.heocholi.spartaeats.global.exception.FileException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final S3Service s3Service;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final PasswordEncoder passwordEncoder;
     
@@ -154,7 +159,27 @@ public class CustomerService {
 
         return new ProfileResponseDTO(customer);
     }
-
+    
+    /**
+     * 프로필 이미지 업로드
+     * @param file
+     * @param customer
+     * @return 업로드된 프로필 이미지
+     * @throws IOException
+     */
+    @Transactional
+    public Long uploadProfileImage(MultipartFile file, Customer customer) throws IOException {
+        if (file.isEmpty()) {
+            throw new FileException(ErrorType.NOT_FOUND_FILE);
+        }
+        
+        String profile = s3Service.upload(file, "profile");
+        customer.updateProfileImage(profile);
+        customerRepository.save(customer);
+        
+        return customer.getId();
+    }
+    
     /* util */
     
     /**
@@ -169,7 +194,7 @@ public class CustomerService {
 
         passwordHistoryRepository.save(passwordHistory);
     }
-
+    
     /**
      * 유저 아이디로 회원 조회
      * @param userId

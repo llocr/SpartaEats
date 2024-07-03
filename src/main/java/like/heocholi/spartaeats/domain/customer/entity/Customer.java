@@ -27,7 +27,9 @@ public class Customer extends Timestamped {
 	private String name;
 
 	private String password;
-
+	
+	private String profileImage;
+	
 	private String address;
 
 	private String refreshToken;
@@ -76,6 +78,11 @@ public class Customer extends Timestamped {
 	public void updateProfile(ProfileRequestDTO requestDTO) {
 		this.name = requestDTO.getName() != null ? requestDTO.getName() : name;
 		this.bio = requestDTO.getBio() != null ? requestDTO.getBio() : bio;
+	}
+	
+	// 프로필 사진 업데이트 메서드
+	public void updateProfileImage(String imageUrl) {
+		this.profileImage = imageUrl;
 	}
 
 	// 비밀번호 업데이트 메서드
