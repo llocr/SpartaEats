@@ -6,21 +6,19 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 
 @Repository
-public class CustomerJpaRepository implements CustomerRepositoryCustom {
+@RequiredArgsConstructor
+public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
-	
-	public CustomerJpaRepository(EntityManager em) {
-		this.queryFactory = new JPAQueryFactory(em);
-	}
 	
 	/**
 	 * 좋아요한 리뷰 개수 조회
 	 * @param userId 사용자 ID
 	 * @return long
 	 */
+	@Override
 	public long findLikeReviewCount(Long userId) {
 		return queryFactory
 			.select(like)

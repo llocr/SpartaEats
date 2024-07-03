@@ -17,16 +17,13 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import jakarta.persistence.EntityManager;
 import like.heocholi.spartaeats.domain.review.entity.Review;
+import lombok.RequiredArgsConstructor;
 
 @Repository
-public class ReviewJpaRepository implements ReviewRepositoryCustom {
+@RequiredArgsConstructor
+public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
-	
-	public ReviewJpaRepository(EntityManager em) {
-		this.queryFactory = new JPAQueryFactory(em);
-	}
 	
 	/**
 	 * 좋아요한 리뷰 목록 조회
@@ -34,6 +31,7 @@ public class ReviewJpaRepository implements ReviewRepositoryCustom {
 	 * @param pageable 페이징 정보
 	 * @return Page<Review>
 	 */
+	@Override
 	public Page<Review> findLikeReview(Long userId, Pageable pageable) {
 		// 페이징 및 정렬
 		OrderSpecifier<?> sortedColumn = review.createdAt.desc();  // 기본값 설정
@@ -63,6 +61,7 @@ public class ReviewJpaRepository implements ReviewRepositoryCustom {
 	 * @param pageable 페이징 정보
 	 * @return Page<Review>
 	 */
+	@Override
 	public Page<Review> findPickReview(Long userId, Pageable pageable) {
 		// 기본 정렬 조건 설정
 		OrderSpecifier<?> sortedColumn = review.createdAt.desc();
