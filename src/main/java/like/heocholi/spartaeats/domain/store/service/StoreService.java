@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import like.heocholi.spartaeats.domain.common.util.page.PageUtil;
 import like.heocholi.spartaeats.domain.menu.exception.MenuException;
-import like.heocholi.spartaeats.domain.pick.repository.PickRepository;
 import like.heocholi.spartaeats.domain.store.dto.StorePageResponseDto;
 import like.heocholi.spartaeats.domain.store.dto.StoreResponseDto;
 import like.heocholi.spartaeats.domain.store.dto.StoreTopPickResponseDTO;
@@ -27,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class StoreService {
     private final StoreRepository storeRepository;
-    private final PickRepository pickRepository;
 
     /**
      * 가게 단건 조회
