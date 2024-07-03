@@ -57,7 +57,11 @@ public enum ErrorType {
     NOT_FOUND_STORES(HttpStatus.NOT_FOUND,"음식점이 존재하지 않습니다."),
 
     //pick
-    NOT_FOUND_PICK(HttpStatus.NOT_FOUND,"찜 목록이 존재하지 않습니다.");
+    NOT_FOUND_PICK(HttpStatus.NOT_FOUND,"찜 목록이 존재하지 않습니다."),
+    
+    //file
+    NOT_FOUND_FILE(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다."),
+    FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
