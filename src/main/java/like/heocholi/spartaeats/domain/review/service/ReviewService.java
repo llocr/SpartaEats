@@ -152,7 +152,7 @@ public class ReviewService {
     
     /**
      * 리뷰 작성자 확인
-     * @param customer
+     * @param customer\\
      * @param review
      */
     private static void checkValidateCustomer(Customer customer, Review review) {

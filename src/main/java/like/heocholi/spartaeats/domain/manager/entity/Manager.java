@@ -6,6 +6,7 @@ import like.heocholi.spartaeats.domain.customer.enums.UserStatus;
 import like.heocholi.spartaeats.domain.customer.dto.SignupRequestDto;
 import like.heocholi.spartaeats.domain.store.entity.Store;
 import like.heocholi.spartaeats.domain.common.entity.Timestamped;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -40,5 +41,14 @@ public class Manager extends Timestamped {
 		this.password = encodedPassword;
 		this.userStatus = UserStatus.ACTIVE;
 		this.role = UserRole.ROLE_CUSTOMER;
+	}
+	
+	@Builder
+	public Manager(String userId, String password, String refreshToken, UserStatus userStatus, UserRole role) {
+		this.userId = userId;
+		this.password = password;
+		this.refreshToken = refreshToken;
+		this.userStatus = userStatus;
+		this.role = role;
 	}
 }

@@ -10,6 +10,7 @@ import like.heocholi.spartaeats.domain.order.entity.Order;
 import like.heocholi.spartaeats.domain.pick.entity.Pick;
 import like.heocholi.spartaeats.domain.review.entity.Review;
 import like.heocholi.spartaeats.domain.common.entity.Timestamped;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -42,4 +43,12 @@ public class Store extends Timestamped {
 
 	@OneToMany(mappedBy = "store", cascade = CascadeType.PERSIST)
 	private List<Review> reviews;
+	
+	@Builder
+	public Store(String name, Manager manager, String address, RestaurantType type) {
+		this.name = name;
+		this.manager = manager;
+		this.address = address;
+		this.type = type;
+	}
 }

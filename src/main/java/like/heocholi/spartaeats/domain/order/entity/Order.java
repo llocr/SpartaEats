@@ -19,6 +19,7 @@ import like.heocholi.spartaeats.domain.order.enums.OrderState;
 import like.heocholi.spartaeats.domain.customer.entity.Customer;
 import like.heocholi.spartaeats.domain.store.entity.Store;
 import like.heocholi.spartaeats.domain.common.entity.Timestamped;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -55,6 +56,16 @@ public class Order extends Timestamped {
 		this.store = store;
 		this.customer = customer;
 		this.address = customer.getAddress();
+	}
+	
+	@Builder
+	public Order(Store store, Customer customer, String address, OrderState state, List<OrderMenu> orderMenuList, int totalPrice) {
+		this.store = store;
+		this.customer = customer;
+		this.address = address;
+		this.state = state;
+		this.orderMenuList = orderMenuList;
+		this.totalPrice = totalPrice;
 	}
 	
 	public void updateOrder(List<OrderMenu> orderMenuList, int totalPrice) {
