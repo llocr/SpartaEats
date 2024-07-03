@@ -12,9 +12,11 @@ import like.heocholi.spartaeats.domain.review.entity.Review;
 import like.heocholi.spartaeats.domain.common.entity.Timestamped;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "stores")
 public class Store extends Timestamped {
 	@Id
