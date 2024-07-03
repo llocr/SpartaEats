@@ -25,6 +25,7 @@ import like.heocholi.spartaeats.domain.order.entity.Order;
 import like.heocholi.spartaeats.domain.order.repository.OrderRepository;
 import like.heocholi.spartaeats.domain.pick.entity.Pick;
 import like.heocholi.spartaeats.domain.pick.repository.PickRepository;
+import like.heocholi.spartaeats.domain.review.dto.ReviewSearchCond;
 import like.heocholi.spartaeats.domain.review.entity.Review;
 import like.heocholi.spartaeats.domain.store.entity.Store;
 import like.heocholi.spartaeats.domain.store.repository.StoreRepository;
@@ -118,6 +119,7 @@ class ReviewRepositoryTest {
 		Pick pick = Pick.builder()
 			.customer(customer2)
 			.store(store)
+			.isPick(true)
 			.build();
 		pickRepository.save(pick);
 	}
@@ -135,6 +137,24 @@ class ReviewRepositoryTest {
 		//then
 		assertThat(likeReview.getContent().size()).isEqualTo(1);
 		assertThat(likeReview.getContent().get(0).getCustomer().getId()).isEqualTo(customer1.getId());
+	}
+	
+	@Test
+	@DisplayName("찜한 가게의 리뷰 조회")
+	void 찜한가게리뷰조회() {
+	    //given
+		Long customerId = customer2.getId();
+		ReviewSearchCond cond = new ReviewSearchCond();
+		cond.setAddress("서울");
+		Sort sort = Sort.by("userId").ascending();
+	    Pageable pageable = PageUtil.createPageable(1, sort);
+		
+	    //when
+		Page<Review> pickReview = reviewRepository.findPickReview(cond, customerId, pageable);
+	    
+	    //then
+		assertThat(pickReview.getContent().size()).isEqualTo(1);
+		assertThat(pickReview.getContent().get(0).getCustomer().getId()).isEqualTo(customer1.getId());
 	}
 	
 }

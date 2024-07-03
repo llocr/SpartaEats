@@ -26,6 +26,7 @@ import like.heocholi.spartaeats.domain.manager.entity.Manager;
 import like.heocholi.spartaeats.domain.order.entity.Order;
 import like.heocholi.spartaeats.domain.pick.entity.Pick;
 import like.heocholi.spartaeats.domain.review.dto.ReviewListResponseDTO;
+import like.heocholi.spartaeats.domain.review.dto.ReviewSearchCond;
 import like.heocholi.spartaeats.domain.review.entity.Review;
 import like.heocholi.spartaeats.domain.review.repository.ReviewRepository;
 import like.heocholi.spartaeats.domain.store.entity.Store;
@@ -84,17 +85,6 @@ class ReviewServiceTest {
 			.customer(customer1)
 			.contents("맛있어요")
 			.build();
-		
-		Like like = Like.builder()
-			.customer(customer2)
-			.review(review)
-			.isLike(true)
-			.build();
-		
-		Pick pick = Pick.builder()
-			.customer(customer2)
-			.store(store)
-			.build();
 	}
 	
 	@Test
@@ -102,7 +92,7 @@ class ReviewServiceTest {
 	void 좋아요누른리뷰조회() {
 		//given
 		Integer page = 1;
-		Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+		Pageable pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
 		Page<Review> reviewPage = new PageImpl<>(List.of(review), pageable, 1);
 		
 		when(reviewRepository.findLikeReview(any(), any())).thenReturn(reviewPage);
@@ -116,4 +106,26 @@ class ReviewServiceTest {
 		assertThat(reviewListResponseDTO.getCurrentPage()).isEqualTo(page);
 	}
 	
+	@Test
+	@DisplayName("찜한 가게의 리뷰 조회")
+	void 찜한가게리뷰조회() {
+	    //given
+	    Integer page = 1;
+		String sort = "userId";
+		ReviewSearchCond cond = new ReviewSearchCond();
+		cond.setAddress("서울");
+		
+		Pageable pageable = PageRequest.of(page, 5, Sort.by(sort));
+		Page<Review> reviewPage = new PageImpl<>(List.of(review), pageable, 1);
+		
+		when(reviewRepository.findPickReview(any(), any(), any())).thenReturn(reviewPage);
+		
+	    //when
+		ReviewListResponseDTO reviewListResponseDTO = reviewService.pickReviews(page, sort, cond, customer2);
+	    
+	    //then
+		assertThat(reviewListResponseDTO).isNotNull();
+		assertThat(reviewListResponseDTO.getReviewList()).isNotEmpty();
+		assertThat(reviewListResponseDTO.getCurrentPage()).isEqualTo(page);
+	}
 }
