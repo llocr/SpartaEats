@@ -7,6 +7,7 @@ import like.heocholi.spartaeats.domain.customer.dto.ProfileRequestDTO;
 import like.heocholi.spartaeats.domain.customer.dto.SignupRequestDto;
 import like.heocholi.spartaeats.domain.pick.entity.Pick;
 import like.heocholi.spartaeats.domain.common.entity.Timestamped;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,7 +42,7 @@ public class Customer extends Timestamped {
 
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Pick> pickList;
-
+	
 	public Customer(SignupRequestDto requestDto, String encodedPassword) {
 		this.userId = requestDto.getUserId();
 		this.password = encodedPassword;
@@ -49,6 +50,18 @@ public class Customer extends Timestamped {
 		this.address = requestDto.getAddress();
 		this.userStatus = UserStatus.ACTIVE;
 		this.role = UserRole.ROLE_CUSTOMER;
+	}
+	
+	@Builder
+	public Customer(String userId, String name, String password, String address, String refreshToken, String bio, UserStatus userStatus, UserRole role) {
+		this.userId = userId;
+		this.name = name;
+		this.password = password;
+		this.address = address;
+		this.refreshToken = refreshToken;
+		this.bio = bio;
+		this.userStatus = userStatus;
+		this.role = role;
 	}
 
 	public void saveRefreshToken(String refreshToken){
