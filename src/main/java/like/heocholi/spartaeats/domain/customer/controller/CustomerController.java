@@ -131,7 +131,7 @@ public class CustomerController {
      */
     @PutMapping("/password")
     public ResponseEntity<ResponseMessage<String>> updatePassword(@RequestBody @Valid PasswordRequestDTO request,
-                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
         String customerId = customerService.updatePassword(request, userDetails.getCustomer());
 
         ResponseMessage<String> responseMessage = ResponseMessage.<String>builder()
@@ -167,6 +167,16 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
     
+    /**
+     * 프로필 사진 업로드
+     * @param file
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<Long>>
+     *     - statusCode: 200
+     *     - message: "프로필 사진 업로드가 완료되었습니다."
+     *     - data: 업로드된 프로필 사진 URL
+     * @throws IOException
+     */
     @PostMapping("/profile")
     public ResponseEntity<ResponseMessage<Long>> uploadProfile(
         @RequestPart(value = "image") MultipartFile file,
