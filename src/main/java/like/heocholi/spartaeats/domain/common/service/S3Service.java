@@ -26,6 +26,13 @@ public class S3Service {
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 	
+	/**
+	 * 파일 업로드
+	 * @param multipartFile
+	 * @param dirName
+	 * @return 업로드된 파일 URL
+	 * @throws IOException
+	 */
 	public String upload(MultipartFile multipartFile, String dirName) throws IOException {
 		File uploadFile = convert(multipartFile)
 			.orElseThrow(() -> new FileException(ErrorType.FILE_UPLOAD_ERROR));
@@ -33,6 +40,12 @@ public class S3Service {
 		return upload(uploadFile, dirName);
 	}
 	
+	/**
+	 * 파일 업로드
+	 * @param uploadFile
+	 * @param dirName
+	 * @return 업로드된 파일 URL
+	 */
 	private String upload(File uploadFile, String dirName) {
 		String fileName = dirName + "/" + uploadFile.getName();
 		String uploadImageUrl = putS3(uploadFile, fileName);
@@ -41,6 +54,12 @@ public class S3Service {
 		return uploadImageUrl;
 	}
 	
+	/**
+	 * S3에 파일 업로드
+	 * @param uploadFile
+	 * @param fileName
+	 * @return 업로드된 파일 URL
+	 */
 	private String putS3(File uploadFile, String fileName) {
 		s3Client.putObject(
 			new PutObjectRequest(bucket, fileName, uploadFile)
@@ -49,6 +68,10 @@ public class S3Service {
 		return s3Client.getUrl(bucket, fileName).toString();
 	}
 	
+	/**
+	 * 파일 삭제
+	 * @param targetFile
+	 */
 	private void removeNewFile(File targetFile) {
 		String name = targetFile.getName();
 		
@@ -59,6 +82,12 @@ public class S3Service {
 		}
 	}
 	
+	/**
+	 * MultipartFile을 File로 변환
+	 * @param multipartFile
+	 * @return Optional<File>
+	 * @throws IOException
+	 */
 	public Optional<File> convert(MultipartFile multipartFile) throws IOException {
 		File convertFile = new File(multipartFile.getOriginalFilename());
 		
