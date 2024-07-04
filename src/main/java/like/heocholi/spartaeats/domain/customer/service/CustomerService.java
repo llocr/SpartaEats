@@ -203,6 +203,24 @@ public class CustomerService {
         return customer.getId();
     }
     
+    /**
+     * 프로필 이미지 삭제
+     * @param customer
+     * @return 삭제된 프로필 이미지
+     */
+    @Transactional
+    public Long deleteProfileImage(Customer customer) {
+        // 프로필 사진 삭제
+        if (customer.getProfileImage() == null) {
+            throw new FileException(ErrorType.NOT_FOUND_FILE);
+        }
+        
+        s3Service.deleteProfileImage(customer.getProfileImage());
+        customer.updateProfileImage(null);
+        customerRepository.save(customer);
+        
+        return customer.getId();
+    }
     
     /* util */
     
