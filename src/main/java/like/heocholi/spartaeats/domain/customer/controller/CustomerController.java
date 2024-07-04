@@ -192,4 +192,30 @@ public class CustomerController {
         
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
+    
+    /**
+     * 프로필 사진 변경
+     * @param file
+     * @param userDetails
+     * @return ResponseEntity<ResponseMessage<Long>>
+     *     - statusCode: 200
+     *     - message: "프로필 사진 변경이 완료되었습니다."
+     *     - data: 변경된 프로필 사진 URL
+     * @throws IOException
+     */
+    @PutMapping("/profile")
+    public ResponseEntity<ResponseMessage<Long>> updateProfileImage(
+        @RequestPart(value = "image") MultipartFile file,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        
+        Long responseDTO = customerService.updateProfileImage(file, userDetails.getCustomer());
+        
+        ResponseMessage<Long> responseMessage = ResponseMessage.<Long>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("프로필 사진 변경이 완료되었습니다.")
+            .data(responseDTO)
+            .build();
+        
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 }

@@ -180,6 +180,30 @@ public class CustomerService {
         return customer.getId();
     }
     
+    /**
+     * 프로필 이미지 업데이트
+     * @param file
+     * @param customer
+     * @return 업데이트된 프로필 이미지
+     * @throws IOException
+     */
+    @Transactional
+    public Long updateProfileImage(MultipartFile file, Customer customer) throws IOException {
+        // 이전 프로필 사진 삭제
+        if (customer.getProfileImage() == null) {
+            throw new FileException(ErrorType.NOT_FOUND_FILE);
+        }
+        
+        s3Service.deleteProfileImage(customer.getProfileImage());
+        
+        // 새 프로필 사진 업로드
+        String newProfileImagePath = s3Service.upload(file, "profile");
+        customer.updateProfileImage(newProfileImagePath);
+        customerRepository.save(customer);
+        return customer.getId();
+    }
+    
+    
     /* util */
     
     /**

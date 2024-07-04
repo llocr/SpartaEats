@@ -3,13 +3,17 @@ package like.heocholi.spartaeats.domain.common.service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
 import like.heocholi.spartaeats.global.exception.ErrorType;
@@ -47,7 +51,7 @@ public class S3Service {
 	 * @return 업로드된 파일 URL
 	 */
 	private String upload(File uploadFile, String dirName) {
-		String fileName = dirName + "/" + uploadFile.getName();
+		String fileName = dirName + "/" + UUID.randomUUID();
 		String uploadImageUrl = putS3(uploadFile, fileName);
 		
 		removeNewFile(uploadFile);
@@ -99,5 +103,41 @@ public class S3Service {
 		}
 		
 		return Optional.empty();
+	}
+	
+	/**
+	 * S3에 저장된 프로필 이미지 삭제
+	 * @param filePath
+	 */
+	public void deleteProfileImage(String filePath) {
+		String fileName = extractFileNameFromURL(filePath);
+		
+		try {
+			if (s3Client.doesObjectExist(bucket, fileName)) {
+				s3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+				log.info(fileName + " 파일이 S3에서 삭제되었습니다.");
+			} else {
+				log.warn(fileName + " 파일이 S3에 존재하지 않습니다.");
+			}
+		} catch (Exception e) {
+			log.error("S3 파일 삭제 중 오류 발생: ", e);
+			throw new FileException(ErrorType.FILE_DELETE_ERROR);
+		}
+	}
+	
+	/**
+	 * URL에서 파일 이름 추출
+	 * @param url
+	 * @return 파일 이름
+	 */
+	public String extractFileNameFromURL (String url) {
+		try {
+			URL parsedUrl = new URL(url);
+			String substring = parsedUrl.getPath().substring(1);
+			log.info(substring);
+			return substring;
+		} catch (MalformedURLException e) {
+			throw new FileException(ErrorType.INVALID_URL);
+		}
 	}
 }

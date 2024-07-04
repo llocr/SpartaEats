@@ -61,7 +61,9 @@ public enum ErrorType {
     
     //file
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다."),
-    FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다.");
+    FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다."),
+    FILE_DELETE_ERROR(HttpStatus.BAD_REQUEST, "파일 삭제에 실패했습니다."),
+    INVALID_URL(HttpStatus.BAD_REQUEST, "유효하지 않은 URL입니다."),;
 
     private final HttpStatus httpStatus;
     private final String message;
